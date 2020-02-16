@@ -23,16 +23,20 @@ parallel_forecast <- function(.mbl, ...) {
   mable_keys <- key_vars(.mbl)
   mable_models <- mable_names[!mable_names %in% mable_keys]
 
+  response_var <- .mbl[[mable_models[1]]][[1]]$response
+
   .mbl <- .mbl %>%
     mutate(group_id = row_number() %% splits) %>%
     group_split(group_id, keep = FALSE) %>%
     map(as_mable, key = all_of(mable_keys), models = all_of(mable_models))
 
+
   results <- suppressWarnings(
     future.apply::future_lapply(.mbl, fabletools::forecast, ...) %>%
       map(as_tibble) %>%
       bind_rows() %>%
-      mutate(.sd = map_dbl(.distribution, ~ .x[[2]])) %>%
+      mutate(.distribution = ifelse(is.na(!!!response_var), list(list(0, 0)), .distribution),
+             .sd = map_dbl(.distribution, pluck, 2)) %>%
       select(-.distribution)
   )
 
