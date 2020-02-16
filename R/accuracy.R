@@ -12,7 +12,7 @@
 parallel_accuracy <- function(.mbl, ...) {
 
   # If not a list of mables, split the data
-  if (!is.list(.mbl)) {
+  if (is_mable(.mbl)) {
     workers <- future::nbrOfWorkers()
     num_keys <- tsibble::n_keys(.ts)
 
