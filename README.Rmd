@@ -1,0 +1,115 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%",
+  warning = FALSE
+)
+```
+
+# parable
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+<!-- badges: end -->
+
+The goal of parable is to enable the user to use `fable` in parallel.
+
+## Installation
+
+You can install the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("markfairbanks/parable")
+```
+
+Note that `parable` uses a custom version of `fabletools`, which can be installed here:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("markfairbanks/fabletools")
+```
+
+## Functions
+
+`parable` has 3 core functions:
+
+* `parallel_model()`
+* `parallel_forecast()`
+* `parallel_accuracy()`
+
+Each function is used just like the functions from `fable`, but a `future::plan` must be set.
+
+We start with an example tsibble with 50 time-series.
+
+```{r}
+pacman::p_load(tidyverse, parable, janitor, lubridate,
+               tsibble, fable, fabletools, feasts, tsibbledata)
+
+aus_ts <- tsibbledata::aus_retail %>%
+  rename_all(janitor::make_clean_names) %>%
+  update_tsibble(key = series_id, index = month) %>%
+  select(-state, -industry) %>%
+  filter(year(month) >= 2010) %>%
+  group_by_key() %>%
+  filter(group_indices() <= 50) %>%
+  ungroup()
+
+aus_ts
+```
+
+The below chunk shows how to use `parable`, with `tictoc` used to show timings of the `parallel_model()` step:
+
+```{r warn = FALSE}
+pacman::p_load(future, future.apply)
+
+plan(multiprocess, workers = 5)
+
+tictoc::tic()
+
+parable_mbl <- aus_ts %>%
+  parallel_model(ets = ETS(turnover))
+
+tictoc::toc()
+```
+
+And timings for the `parallel_forecast()` step:
+
+```{r}
+tictoc::tic()
+
+parable_fbl <- parable_mbl %>%
+  parallel_forecast(h = 12)
+
+tictoc::toc()
+```
+
+In comparison to normal `fable`, we can see the time improvements:
+
+```{r}
+tictoc::tic()
+
+fable_mbl <- aus_ts %>%
+  model(ets = ETS(turnover))
+
+tictoc::toc()
+```
+
+```{r}
+tictoc::tic()
+
+parable_fbl <- fable_mbl %>%
+  forecast(h = 12)
+
+tictoc::toc()
+```
+
+
