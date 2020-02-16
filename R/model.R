@@ -27,7 +27,7 @@ parallel_model <- function(.ts, ...) {
     mutate(group_id = dplyr::group_indices() %% splits) %>%
     ungroup() %>%
     group_split(group_id, keep = FALSE) %>%
-    future_map(fabletools::model, ...)
+    future_lapply(fabletools::model, ...)
 
   future:::ClusterRegistry("stop")
   invisible(gc())
