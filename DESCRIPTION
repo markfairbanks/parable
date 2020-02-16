@@ -13,11 +13,11 @@ LazyData: true
 URL: https://github.com/markfairbanks/parable
 BugReports: https://github.com/markfairbanks/parable/issues
 Imports: 
-    furrr,
     future,
     future.apply,
     tsibble,
-    dplyr,
     purrr,
-    magrittr
+    dplyr,
+    magrittr,
+    rlang
 RoxygenNote: 7.0.2
