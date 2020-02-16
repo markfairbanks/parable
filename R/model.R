@@ -11,7 +11,7 @@
 #' @examples
 parallel_model <- function(.ts, ...) {
 
-  if (class(.ts)[1] != "tbl_ts") abort(".ts must be a tsibble")
+  if (!is_tsibble(.ts)) abort(".ts must be a tsibble")
 
   # Add check to see if future/furrr is loaded
   workers <- future::nbrOfWorkers()
