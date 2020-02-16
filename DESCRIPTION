@@ -10,3 +10,5 @@ Description: Parallel tools for 'fable'
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/markfairbanks/parable
+BugReports: https://github.com/markfairbanks/parable/issues
