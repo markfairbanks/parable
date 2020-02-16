@@ -27,7 +27,7 @@ parallel_forecast <- function(.mbl, ...) {
   }
 
   results <- suppressWarnings(
-    future_lapply(.mbl, fabletools::forecast, ...) %>%
+    future.apply::future_lapply(.mbl, fabletools::forecast, ...) %>%
       map(as_tibble) %>%
       bind_rows() %>%
       mutate(.sd = map_dbl(.distribution, ~ .x[[2]])) %>%

@@ -26,7 +26,7 @@ parallel_accuracy <- function(.mbl, ...) {
       group_split(group_id, keep = FALSE)
   }
 
-  results <- bind_rows(future_lapply(.mbl, fabletools::accuracy, ...))
+  results <- bind_rows(future.apply::future_lapply(.mbl, fabletools::accuracy, ...))
 
   future:::ClusterRegistry("stop")
   invisible(gc())
