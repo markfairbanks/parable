@@ -74,10 +74,10 @@ aus_ts
 ```
 
 The below chunk shows how to use `parable`, with `tictoc` used to show
-timings of the `parallel_model()` step:
+the timing of the `parallel_model()` step:
 
 ``` r
-pacman::p_load(future, future.apply)
+pacman::p_load(future)
 
 plan(multiprocess, workers = 5)
 
@@ -87,22 +87,10 @@ parable_mbl <- aus_ts %>%
   parallel_model(ets = ETS(turnover))
 
 tictoc::toc()
-#> 13.909 sec elapsed
+#> 13.866 sec elapsed
 ```
 
-And timings for the `parallel_forecast()` step:
-
-``` r
-tictoc::tic()
-
-parable_fbl <- parable_mbl %>%
-  parallel_forecast(h = 12)
-
-tictoc::toc()
-#> 5.439 sec elapsed
-```
-
-In comparison to normal `fable`, we can see the time improvements:
+Which we can then compare to the timing of normal `fable`:
 
 ``` r
 tictoc::tic()
@@ -111,15 +99,5 @@ fable_mbl <- aus_ts %>%
   model(ets = ETS(turnover))
 
 tictoc::toc()
-#> 48.257 sec elapsed
-```
-
-``` r
-tictoc::tic()
-
-parable_fbl <- fable_mbl %>%
-  forecast(h = 12)
-
-tictoc::toc()
-#> 0.201 sec elapsed
+#> 46.905 sec elapsed
 ```
