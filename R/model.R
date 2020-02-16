@@ -22,15 +22,28 @@ parallel_model <- function(.ts, ...) {
   else
     splits <- workers
 
-  results <- .ts %>%
-    group_by_key() %>%
-    mutate(group_id = dplyr::group_indices() %% splits) %>%
-    ungroup() %>%
-    group_split(group_id, keep = FALSE) %>%
-    future.apply::future_lapply(fabletools::model, ...)
+  key_names <- key_vars(.ts)
+  model_names <- names(enexprs(...))
+
+  results_mbl <- suppressWarnings(
+    .ts %>%
+      group_by_key() %>%
+      mutate(group_id = dplyr::group_indices() %% splits) %>%
+      ungroup() %>%
+      group_split(group_id, keep = FALSE) %>%
+      future.apply::future_lapply(fabletools::model, ...) %>%
+      bind_rows() %>%
+      as_mable(key = all_of(key_names), models = model_names)
+  )
+
+  list_cols <- colnames(results_mbl)[map_lgl(results_mbl, is_list)]
+
+  for (col in list_cols) {
+    results_mbl[[col]] <- fabletools:::add_class(results_mbl[[col]], "lst_mdl")
+  }
 
   future:::ClusterRegistry("stop")
   invisible(gc())
 
-  results
+  results_mbl
 }

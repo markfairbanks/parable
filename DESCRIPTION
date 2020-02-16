@@ -19,5 +19,6 @@ Imports:
     purrr,
     dplyr,
     magrittr,
-    rlang
+    rlang,
+    tidyselect
 RoxygenNote: 7.0.2

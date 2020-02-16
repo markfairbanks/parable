@@ -14,7 +14,7 @@ parallel_forecast <- function(.mbl, ...) {
   # If not a list of mables, split the data
   if (is_mable(.mbl)) {
     workers <- future::nbrOfWorkers()
-    num_keys <- tsibble::n_keys(.ts)
+    num_keys <- tsibble::n_keys(.mbl)
 
     if (num_keys < workers)
       splits <- num_keys
