@@ -36,16 +36,15 @@ parallel_model <- function(.ts, ...) {
       mutate(group_id = group_indices() %% splits) %>%
       ungroup() %>%
       group_split(group_id, keep = FALSE) %>%
-      future.apply::future_lapply(fabletools::model, ...) %>%
+      future.apply::future_lapply(ts_model, ...) %>%
       bind_rows() %>%
       as_mable(key = all_of(key_names), models = all_of(model_names))
   )
 
   list_cols <- colnames(results_mbl)[map_lgl(results_mbl, is_list)]
 
-  for (col in list_cols) {
-    results_mbl[[col]] <- new_vctr(results_mbl[[col]], "lst_mdl")
-  }
+  for (col in list_cols)
+    results_mbl[[col]] <- add_class(results_mbl[[col]], "lst_mdl")
 
   future:::ClusterRegistry("stop")
   invisible(gc())
