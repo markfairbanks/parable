@@ -13,9 +13,14 @@ parallel_model <- function(.ts, ...) {
 
   if (!is_tsibble(.ts)) abort(".ts must be a tsibble")
 
-  # Add check to see if future/furrr is loaded
+  if (!is_attached("package:future")) abort("future is not loaded")
+
   workers <- future::nbrOfWorkers()
-  num_keys <- tsibble::n_keys(.ts)
+
+  if (workers == 1)
+    abort("Only 1 core is being used. \n Please run plan(multiprocess) to enable more cores")
+
+  num_keys <- n_keys(.ts)
 
   if (num_keys < workers)
     splits <- num_keys
@@ -39,7 +44,7 @@ parallel_model <- function(.ts, ...) {
   list_cols <- colnames(results_mbl)[map_lgl(results_mbl, is_list)]
 
   for (col in list_cols) {
-    results_mbl[[col]] <- add_class(results_mbl[[col]], "lst_mdl")
+    results_mbl[[col]] <- new_vctr(results_mbl[[col]], "lst_mdl")
   }
 
   future:::ClusterRegistry("stop")
