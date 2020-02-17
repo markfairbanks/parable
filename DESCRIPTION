@@ -16,9 +16,9 @@ Imports:
     future,
     future.apply,
     tsibble,
-    purrr,
     dplyr,
     magrittr,
     rlang,
-    tidyselect
+    tidyselect,
+    vctrs
 RoxygenNote: 7.0.2
